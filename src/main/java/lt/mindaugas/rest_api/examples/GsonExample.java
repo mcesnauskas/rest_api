@@ -1,14 +1,15 @@
 package lt.mindaugas.rest_api.examples;
 
 import com.google.gson.Gson;
+import lt.mindaugas.rest_api.common.Constant;
 import lt.mindaugas.rest_api.common.UserSimple;
 import lt.mindaugas.rest_api.common.Util;
 
 public class GsonExample {
     public static void run() {
 //        doExampleJsonSerialization();
-        doExampleJsonDeserialization();
-
+//        doExampleJsonDeserialization();
+//        doExampleJsonAdvanced();
     }
 
     private static void doExampleJsonSerialization() {
@@ -46,5 +47,18 @@ public class GsonExample {
 
         user = (UserSimple) Util.readJsonFromFile.apply(UserSimple.class);
         System.out.println(user);
+    }
+
+    private static void doExampleJsonAdvanced() {
+
+        Gson gson = new Gson();
+        ResourceResponse response = gson.fromJson(Constant.jsonResponse, ResourceResponse.class);
+        System.out.println(response);
+
+        Util.saveToJsonFile.accept(response);
+        Object object = Util.readJsonFromFile.apply(ResourceResponse.class);
+        System.out.println(object);
+
+        ((ResourceResponse) object).getData().forEach(System.out::println);
     }
 }
