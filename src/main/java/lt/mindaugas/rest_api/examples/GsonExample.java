@@ -2,6 +2,7 @@ package lt.mindaugas.rest_api.examples;
 
 import com.google.gson.Gson;
 import lt.mindaugas.rest_api.common.UserSimple;
+import lt.mindaugas.rest_api.common.Util;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,29 +28,9 @@ public class GsonExample {
         String json04 = gson.toJson(user);
         System.out.println(json04);
 
-        Consumer<Object> saveToJsonFile =
-                (obj) -> {
-                    FileWriter writer = null;
-                    try {
-                        writer = new FileWriter("./demo/%s.json".formatted(obj.getClass().getSimpleName()));
-                        Gson nGson = new Gson();
-                        nGson.toJson(obj,writer);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        assert writer != null;
-                        try {
-                            writer.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-
-        saveToJsonFile.accept(user);
-        saveToJsonFile.accept("demo");
-        saveToJsonFile.accept(1);
-        saveToJsonFile.accept(new String[]{"demo01", "demo02"});
+        Util.saveToJsonFile.accept(user);
+        Util.saveToJsonFile.accept("demo");
+        Util.saveToJsonFile.accept(1);
+        Util.saveToJsonFile.accept(new String[]{"demo01", "demo02"});
     }
 }
