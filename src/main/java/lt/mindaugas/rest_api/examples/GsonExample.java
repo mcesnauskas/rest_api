@@ -4,14 +4,11 @@ import com.google.gson.Gson;
 import lt.mindaugas.rest_api.common.UserSimple;
 import lt.mindaugas.rest_api.common.Util;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Objects;
-import java.util.function.Consumer;
-
 public class GsonExample {
     public static void run() {
-        doExampleJsonSerialization();
+//        doExampleJsonSerialization();
+        doExampleJsonDeserialization();
+
     }
 
     private static void doExampleJsonSerialization() {
@@ -32,5 +29,22 @@ public class GsonExample {
         Util.saveToJsonFile.accept("demo");
         Util.saveToJsonFile.accept(1);
         Util.saveToJsonFile.accept(new String[]{"demo01", "demo02"});
+    }
+
+    private static void doExampleJsonDeserialization() {
+        String jsonText = """
+                {
+                    "id": 111,
+                    "fullName": "Darth Vader",
+                    "email": "darkempire@demo.com"
+                }
+                """;
+
+        Gson gson = new Gson();
+        UserSimple user = gson.fromJson(jsonText, UserSimple.class);
+        System.out.println(user);
+
+        user = (UserSimple) Util.readJsonFromFile.apply(UserSimple.class);
+        System.out.println(user);
     }
 }
