@@ -1,13 +1,13 @@
 package lt.mindaugas.rest_api.exercises;
 
-public class DetailsClass {
+public class UserDetails {
     private int id;
     private String email;
     private String first_name;
     private String last_name;
     private String avatar;
 
-    public DetailsClass(int id, String email, String first_name, String last_name, String avatar) {
+    public UserDetails(int id, String email, String first_name, String last_name, String avatar) {
         this.id = id;
         this.email = email;
         this.first_name = first_name;
@@ -37,7 +37,7 @@ public class DetailsClass {
 
     @Override
     public String toString() {
-        return "DetailsClass{" +
+        return "UserDetails{" +
                 "id=" + id +
                 ", email='" + email + '\'' +
                 ", first_name='" + first_name + '\'' +

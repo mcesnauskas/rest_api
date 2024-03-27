@@ -9,6 +9,18 @@ import java.util.function.Function;
 
 public class Util {
 
+    public static BiFunction<String, Class<?>, Object> jsonToObj =
+            (json, objClass) -> {
+                Gson gson = new Gson();
+                return gson.fromJson(json, objClass);
+            };
+
+    public static Function<Object, String> objToJson =
+            (obj) -> {
+                Gson gson = new Gson();
+                return gson.toJson(obj);
+            };
+
     public static Consumer<Object> saveToJsonFile =
             (obj) -> {
                 FileWriter writer = null;
@@ -20,11 +32,12 @@ public class Util {
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
-                    assert writer != null;
-                    try {
-                        writer.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    if (writer != null) {
+                        try {
+                            writer.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             };

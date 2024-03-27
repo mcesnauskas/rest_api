@@ -1,8 +1,7 @@
 package lt.mindaugas.rest_api.exercises;
 
 import com.google.gson.Gson;
-import lt.mindaugas.rest_api.common.Constant;
-import lt.mindaugas.rest_api.examples.ResourceResponse;
+import lt.mindaugas.rest_api.common.Util;
 
 public class GsonExercises {
     public static void doUserDetails(){
@@ -23,8 +22,15 @@ public class GsonExercises {
         """;
 
         Gson gson = new Gson();
-        DataClass response = gson.fromJson(userDetails, DataClass.class);
+        UserResponse response = gson.fromJson(userDetails, UserResponse.class);
         System.out.println(response);
 
+        //*
+        Util.saveToJsonFile.accept(response);
+        response = (UserResponse) Util.readJsonFromFile.apply(UserResponse.class);
+        //*
+
+        System.out.println(response.getData());
+        System.out.println(response.getSupport());
     }
 }
