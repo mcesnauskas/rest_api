@@ -3,6 +3,10 @@ package lt.mindaugas.rest_api.common;
 import com.google.gson.Gson;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -64,4 +68,26 @@ public class Util {
                 }
                 return object;
             };
+
+    public static BiFunction<String, Map<String, String>, URI> uriBuilder =
+            (url, queryParam) -> {
+                StringBuilder queryBuilder = new StringBuilder();
+
+
+
+                for (Map.Entry<String, String> entry : queryParam.entrySet()) {
+                    if (!queryBuilder.isEmpty()) {
+                        queryBuilder.append("&");
+                    }
+                    queryBuilder
+                            .append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8))
+                            .append("=")
+                            .append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
+                }
+
+                return URI.create(url + "?" + queryBuilder);
+            };
+
+//    private static Function<String, String> stringEncoder =
+//            (value) -> URLEncoder.encode(value, StandardCharsets.UTF_8);
 }

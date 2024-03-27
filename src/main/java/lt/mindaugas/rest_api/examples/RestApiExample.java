@@ -2,6 +2,7 @@ package lt.mindaugas.rest_api.examples;
 
 import lt.mindaugas.rest_api.common.Util;
 import lt.mindaugas.rest_api.examples.reqres_model.UserDetails;
+import lt.mindaugas.rest_api.examples.reqres_model.UserResponse;
 import lt.mindaugas.rest_api.examples.reqres_model.UsersResponse;
 
 import java.io.IOException;
@@ -10,19 +11,22 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 
 public class RestApiExample {
     private static String baseUrl = "https://reqres.in";
     private static String endpoint = "";
     private static String url;
 
-    public static void run(){
-        getListUsers();
-        checkLombokGeneratedMethods();
+    public static void run() {
+//        getListUsers();
+//        checkLombokGeneratedMethods();
+        getListUsersWithParameters();
+        getUserDetails(5);
     }
 
     private static void getListUsers() {
-        endpoint ="/api/users";
+        endpoint = "/api/users";
         // https://reqres.in/api/users
         // https://reqres.in/api/users?page=3&per_page=3
         url = baseUrl + endpoint;
@@ -61,11 +65,93 @@ public class RestApiExample {
 
     private static void checkLombokGeneratedMethods() {
         UserDetails user01 =
-                new UserDetails(1,"Luke","Skywalker","demo@demo.com","some avatar");
+                new UserDetails(1, "Luke", "Skywalker", "demo@demo.com", "some avatar");
         UserDetails user02 =
                 new UserDetails(1, "Luke", "Skywalker", "demo@demo.com", "some avatar");
 
         System.out.println(user01);
         System.out.println(user01.equals(user02));
+    }
+
+    private static void getListUsersWithParameters() {
+        endpoint = "/api/users";
+        // https://reqres.in/api/users
+        // https://reqres.in/api/users?page=3&per_page=3
+        url = baseUrl + endpoint;
+
+        try {
+            Map<String, String> queryParam =
+                    Map.of(
+                            "page", "4",
+                            "per_page", "3"
+                    );
+
+            URI uri = Util.uriBuilder.apply(url, queryParam);
+            HttpRequest httpRequest = HttpRequest
+                    .newBuilder(uri)
+                    .GET()
+                    .build();
+
+            HttpClient httpClient = HttpClient.newHttpClient();
+
+            HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("\u001B[31m");
+            System.out.println("\n GET user list");
+            System.out.println("\u001B[0m");
+            System.out.println("Response code: " + httpResponse.statusCode());
+            System.out.println("Response headers: " + httpResponse.headers());
+
+            UsersResponse usersResponse =
+                    (UsersResponse) Util.jsonToObj.apply(httpResponse.body(), UsersResponse.class);
+
+            System.out.println("Page no: " + usersResponse.getSomePage());
+            System.out.println("Page total: " + usersResponse.getTotalPages());
+            System.out.println("Per page: " + usersResponse.getPerPage());
+
+            Util.saveToJsonFile.accept(usersResponse);
+            usersResponse = (UsersResponse) Util.readJsonFromFile.apply(UsersResponse.class);
+            usersResponse.getData().forEach(System.out::println);
+
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void getUserDetails(int userId) {
+        System.out.println("\n*** Exercise ***\n");
+        endpoint = "/api/users/" + userId;
+        url = baseUrl + endpoint;
+
+        try {
+            URI uri1 = new URI(url);
+            HttpRequest httpRequest = HttpRequest
+                    .newBuilder()
+                    .uri(uri1)
+                    .GET()
+                    .build();
+
+            HttpClient httpClient = HttpClient.newHttpClient();
+            HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("Response code: " + httpResponse.statusCode());
+            System.out.println("Response body: " + httpResponse.body());
+
+            UserResponse userResponse = (UserResponse) Util.jsonToObj.apply(httpResponse.body(), UserResponse.class);
+            Util.saveToJsonFile.accept(userResponse);
+            userResponse = (UserResponse) Util.readJsonFromFile.apply(UserResponse.class);
+
+//            System.out.println(userResponse.getData().getId());
+//            System.out.println(userResponse.getData().getFirstName());
+//            System.out.println(userResponse.getData().getLastName());
+//            System.out.println(userResponse.getData().getEmail());
+//            System.out.println(userResponse.getData().getAvatar());
+
+            System.out.println(userResponse.getData());
+
+
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
