@@ -1,6 +1,7 @@
 package lt.mindaugas.rest_api.examples;
 
 import lt.mindaugas.rest_api.common.Util;
+import lt.mindaugas.rest_api.examples.reqres_model.UserDetails;
 import lt.mindaugas.rest_api.examples.reqres_model.UsersResponse;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ public class RestApiExample {
 
     public static void run(){
         getListUsers();
+        checkLombokGeneratedMethods();
     }
 
     private static void getListUsers() {
@@ -55,6 +57,15 @@ public class RestApiExample {
         } catch (URISyntaxException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    private static void checkLombokGeneratedMethods() {
+        UserDetails user01 =
+                new UserDetails(1,"Luke","Skywalker","demo@demo.com","some avatar");
+        UserDetails user02 =
+                new UserDetails(1, "Luke", "Skywalker", "demo@demo.com", "some avatar");
+
+        System.out.println(user01);
+        System.out.println(user01.equals(user02));
     }
 }
