@@ -21,8 +21,9 @@ public class RestApiExample {
     public static void run() {
 //        getListUsers();
 //        checkLombokGeneratedMethods();
-        getListUsersWithParameters();
-        getUserDetails(5);
+//        getListUsersWithParameters();
+//        getUserDetails(5);
+        getListUsersIncludingHeaders();
     }
 
     private static void getListUsers() {
@@ -141,16 +142,77 @@ public class RestApiExample {
             Util.saveToJsonFile.accept(userResponse);
             userResponse = (UserResponse) Util.readJsonFromFile.apply(UserResponse.class);
 
+            System.out.println(userResponse.getData());
+
 //            System.out.println(userResponse.getData().getId());
 //            System.out.println(userResponse.getData().getFirstName());
 //            System.out.println(userResponse.getData().getLastName());
 //            System.out.println(userResponse.getData().getEmail());
 //            System.out.println(userResponse.getData().getAvatar());
 
-            System.out.println(userResponse.getData());
-
-
         } catch (URISyntaxException | IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void getListUsersIncludingHeaders() {
+        endpoint = "/api/users";
+        // https://reqres.in/api/users
+        // https://reqres.in/api/users?page=3&per_page=3
+        url = baseUrl + endpoint;
+
+        try {
+            Map<String, String> queryParam =
+                    Map.of(
+                            "page", "4",
+                            "per_page", "3"
+                    );
+
+            Map<String, String> headers =
+                    Map.of(
+                            "content-type", "application/json; charset=utf-8",
+                            "Authorisation", "Bearer your_ access_token",
+                            "X-Api-Key", "your_api_key"
+                    );
+
+            URI uri = Util.uriBuilder.apply(url, queryParam);
+            HttpRequest.Builder builder = HttpRequest
+                    .newBuilder(uri);
+//                    .header("content-type", "content-type")
+//                    .header("Authorisation", "Authorisation")
+//                    .header("X-Api-Key", "X-Api-Key");
+
+
+//            headers.forEach((k, v) -> builder.header(k, v));
+            headers.forEach(builder::header);
+
+            HttpRequest httpRequest = builder.GET().build();
+
+
+            HttpClient httpClient = HttpClient.newHttpClient();
+
+            HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("\u001B[31m");
+            System.out.println("\n GET user list");
+            System.out.println("\u001B[0m");
+
+            System.out.println("Request headers: " + httpResponse.request().headers());
+            System.out.println("Response code: " + httpResponse.statusCode());
+            System.out.println("Response headers: " + httpResponse.headers());
+
+            UsersResponse usersResponse =
+                    (UsersResponse) Util.jsonToObj.apply(httpResponse.body(), UsersResponse.class);
+
+            System.out.println("Page no: " + usersResponse.getSomePage());
+            System.out.println("Page total: " + usersResponse.getTotalPages());
+            System.out.println("Per page: " + usersResponse.getPerPage());
+
+            Util.saveToJsonFile.accept(usersResponse);
+            usersResponse = (UsersResponse) Util.readJsonFromFile.apply(UsersResponse.class);
+            usersResponse.getData().forEach(System.out::println);
+
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
