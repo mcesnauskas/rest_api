@@ -9,7 +9,7 @@ public class Main {
     public static void main(String[] args) {
 //        GsonExample.run();
 //        GsonExercises.doUserDetails();
-//        RestApiExample.run();
-        NewsApiExercise.getNewsSources();
+        RestApiExample.run();
+//        NewsApiExercise.getNewsSources();
     }
 }

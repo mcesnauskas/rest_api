@@ -17,4 +17,11 @@ public class UserDetails {
     private String email;
     @SerializedName("avatar")
     private String avatar;
+
+    public UserDetails(String firstName, String lastName, String email, String avatar) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.avatar = avatar;
+    }
 }

@@ -23,7 +23,8 @@ public class RestApiExample {
 //        checkLombokGeneratedMethods();
 //        getListUsersWithParameters();
 //        getUserDetails(5);
-        getListUsersIncludingHeaders();
+//        getListUsersIncludingHeaders();
+        postNewUser();
     }
 
     private static void getListUsers() {
@@ -216,4 +217,54 @@ public class RestApiExample {
             throw new RuntimeException(e);
         }
     }
+
+    private static void postNewUser() {
+        endpoint = "/api/users";
+        url = baseUrl + endpoint;
+
+        Map<String, String> headers =
+                Map.of(
+                        "content-type", "application/json; charset=utf-8",
+                        "Authorisation", "Bearer your_ access_token",
+                        "X-Api-Key", "your_api_key"
+                );
+
+        String jsonData = """
+                {
+                    "name" : "Yoda",
+                    "email" : "demo@demo.com",
+                    "job" : "Jedi master",
+                    "age" : 255,
+                    "Date of birth" : "3550-01-01"
+                }
+                """;
+
+        UserDetails user = new UserDetails("Darth", "Vader", "demo@demo.com", "some avatar");
+        jsonData = Util.objToJson.apply(user);
+
+        URI uri = URI.create(url);
+        HttpRequest.Builder builder = HttpRequest
+                .newBuilder(uri);
+
+        headers.forEach(builder::header);
+
+        HttpRequest httpRequest =
+                builder
+//                        .POST(HttpRequest.BodyPublishers.ofString(jsonData))
+                        .method("POST", HttpRequest.BodyPublishers.ofString(jsonData))
+                        .build();
+
+        try {
+            HttpResponse<String> httpResponse =
+                    HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("Response code: " + httpResponse.statusCode());
+            System.out.println("Response headers: " + httpResponse.headers());
+            System.out.println("Response body: " + httpResponse.body());
+
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
+
