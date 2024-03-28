@@ -1,6 +1,8 @@
 package lt.mindaugas.rest_api.examples;
 
 import lt.mindaugas.rest_api.common.Util;
+import lt.mindaugas.rest_api.common.connection.HttpConnection;
+import lt.mindaugas.rest_api.common.connection.RequestMethod;
 import lt.mindaugas.rest_api.examples.reqres_model.UserDetails;
 import lt.mindaugas.rest_api.examples.reqres_model.UserResponse;
 import lt.mindaugas.rest_api.examples.reqres_model.UsersResponse;
@@ -24,7 +26,11 @@ public class RestApiExample {
 //        getListUsersWithParameters();
 //        getUserDetails(5);
 //        getListUsersIncludingHeaders();
-        postNewUser();
+//        postNewUser();
+//        getListUsersByCustomisedConnection();
+//        postNewUserByCustomisedConnection();
+//        putUserByCustomisedConnection();
+        deleteUserByCustomisedConnection();
     }
 
     private static void getListUsers() {
@@ -258,6 +264,182 @@ public class RestApiExample {
             HttpResponse<String> httpResponse =
                     HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
+            System.out.println("Response code: " + httpResponse.statusCode());
+            System.out.println("Response headers: " + httpResponse.headers());
+            System.out.println("Response body: " + httpResponse.body());
+
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void getListUsersByCustomisedConnection() {
+        endpoint = "/api/users";
+        url = baseUrl + endpoint;
+
+        Map<String, String> queryParam =
+                Map.of(
+                        "page", "4",
+                        "per_page", "3"
+                );
+
+        Map<String, String> headers =
+                Map.of(
+                        "content-type", "application/json; charset=utf-8",
+                        "Authorisation", "Bearer your_ access_token",
+                        "X-Api-Key", "your_api_key"
+                );
+
+        try {
+            HttpResponse<String> httpResponse = HttpConnection
+                    .request
+                    .openUrl(url)
+                    .setParams(queryParam)
+                    .setHeaders(headers)
+                    .build(RequestMethod.GET);
+
+            System.out.println("\u001B[31m");
+            System.out.println("\n GET user list");
+            System.out.println("\u001B[0m");
+            System.out.println("Request: " + httpResponse.request());
+            System.out.println("Response code: " + httpResponse.statusCode());
+            System.out.println("Response headers: " + httpResponse.headers());
+            System.out.println("Response body: " + httpResponse.body());
+
+            UsersResponse usersResponse =
+                    (UsersResponse) Util.jsonToObj.apply(httpResponse.body(), UsersResponse.class);
+
+            usersResponse.getData().forEach(System.out::println);
+
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    private static void postNewUserByCustomisedConnection() {
+        endpoint = "/api/users";
+        url = baseUrl + endpoint;
+
+        Map<String, String> queryParam =
+                Map.of(
+                        "page", "4",
+                        "per_page", "3"
+                );
+
+        Map<String, String> headers =
+                Map.of(
+                        "content-type", "application/json; charset=utf-8",
+                        "Authorisation", "Bearer your_ access_token",
+                        "X-Api-Key", "your_api_key"
+                );
+
+        UserDetails user = new UserDetails("Darth", "Vader", "demo@demo.com", "some avatar");
+
+        try {
+            HttpResponse<String> httpResponse = HttpConnection
+                    .request
+                    .openUrl(url)
+                    .setHeaders(headers)
+                    .setBodyPublisher(user)
+                    .build(RequestMethod.POST);
+
+            System.out.println("\u001B[31m");
+            System.out.println("\n POST new user");
+            System.out.println("\u001B[0m");
+            System.out.println("Request: " + httpResponse.request());
+            System.out.println("Response code: " + httpResponse.statusCode());
+            System.out.println("Response headers: " + httpResponse.headers());
+            System.out.println("Response body: " + httpResponse.body());
+
+            UserDetails userDetails =
+                    (UserDetails) Util.jsonToObj.apply(httpResponse.body(), UserDetails.class);
+            System.out.println(userDetails);
+
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void putUserByCustomisedConnection() {
+        // PUT -> atnaujina visus objekto laukus (perraso)
+        // PATCH -> galima atnaujinti viena ar keleta lauku
+
+        endpoint = "/api/users";
+        url = baseUrl + endpoint;
+
+        Map<String, String> queryParam =
+                Map.of(
+                        "page", "4",
+                        "per_page", "3"
+                );
+
+        Map<String, String> headers =
+                Map.of(
+                        "content-type", "application/json; charset=utf-8",
+                        "Authorisation", "Bearer your_ access_token",
+                        "X-Api-Key", "your_api_key"
+                );
+
+        UserDetails user = new UserDetails(
+                45,"Darth", "Vader", "demo@demo.com", "some avatar"
+        );
+        url += "/" + user.getId();
+        // butinai nurodom ID
+
+        try {
+            HttpResponse<String> httpResponse = HttpConnection
+                    .request
+                    .openUrl(url)
+                    .setBodyPublisher(user)
+                    .setHeaders(headers)
+                    .build(RequestMethod.PUT);
+
+            System.out.println("\u001B[31m");
+            System.out.println("\n PUT new user");
+            System.out.println("\u001B[0m");
+            System.out.println("Request: " + httpResponse.request());
+            System.out.println("Response code: " + httpResponse.statusCode());
+            System.out.println("Response headers: " + httpResponse.headers());
+            System.out.println("Response body: " + httpResponse.body());
+
+            UserDetails userDetails =
+                    (UserDetails) Util.jsonToObj.apply(httpResponse.body(), UserDetails.class);
+            System.out.println(userDetails);
+
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void deleteUserByCustomisedConnection() {
+        endpoint = "/api/users";
+        url = baseUrl + endpoint;
+
+        Map<String, String> headers =
+                Map.of(
+                        "content-type", "application/json; charset=utf-8",
+                        "Authorisation", "Bearer your_ access_token",
+                        "X-Api-Key", "your_api_key"
+                );
+
+        UserDetails user = new UserDetails(
+                45,"Darth", "Vader", "demo@demo.com", "some avatar"
+        );
+        url += "/" + user.getId();
+
+        try {
+            HttpResponse<String> httpResponse = HttpConnection
+                    .request
+                    .openUrl(url)
+                    .setHeaders(headers)
+                    .build(RequestMethod.DELETE);
+
+            System.out.println("\u001B[31m");
+            System.out.println("\n DELETE user");
+            System.out.println("\u001B[0m");
+            System.out.println("Request: " + httpResponse.request());
             System.out.println("Response code: " + httpResponse.statusCode());
             System.out.println("Response headers: " + httpResponse.headers());
             System.out.println("Response body: " + httpResponse.body());
